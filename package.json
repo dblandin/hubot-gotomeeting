@@ -1,0 +1,25 @@
+{
+  "name": "hubot-gotomeeting",
+  "version": "0.0.1",
+  "description": "hubot script to manage GoToMeeting meetings",
+  "main": "src/gotomeeting.coffee",
+  "scripts": {
+    "test": "script/test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:dblandin/hubot-gotomeeting.git"
+  },
+  "keywords": [
+    "hubot",
+    "gotomeeting",
+    "citrix",
+    "meeting"
+  ],
+  "author": "Devon Blandin",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/dblandin/hubot-gotomeeting/issues"
+  },
+  "homepage": "https://github.com/dblandin/hubot-gotomeeting"
+}
