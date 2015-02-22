@@ -26,12 +26,17 @@ printMeetings = (meetings) ->
   messages.push(formattedMeeting(meeting)) for meeting in meetings
   messages.join("\n")
 
+ensureConfig = (msg) ->
+  if process.env.HUBOT_GOTOMEETING_USER_TOKEN?
+    true
+  else
+    msg.reply 'HUBOT_GOTOMEETING_USER_TOKEN is not set.'
+
+    false
+
 module.exports = (robot) ->
   robot.respond /list meetings/i, (msg) ->
-    if not process.env.HUBOT_GOTOMEETING_USER_TOKEN?
-      msg.reply 'HUBOT_GOTOMEETING_USER_TOKEN is not set.'
-
-      return
+    return unless ensureConfig(msg)
 
     token = process.env.HUBOT_GOTOMEETING_USER_TOKEN
     msg.http('https://api.citrixonline.com/G2M/rest/meetings')
