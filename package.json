@@ -4,7 +4,8 @@
   "description": "hubot script to manage GoToMeeting meetings",
   "main": "src/gotomeeting.coffee",
   "scripts": {
-    "test": "script/test"
+    "test": "script/test",
+    "shell": "hubot -r src"
   },
   "repository": {
     "type": "git",
