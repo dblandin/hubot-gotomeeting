@@ -15,6 +15,32 @@
 # Author:
 #   Devon Blandin <dblandin@gmail.com>
 
+formattedMeeting = (meeting) ->
+  formatted = "#{meeting.subject}"
+  formatted += ' [active]' if meeting.status is 'ACTIVE'
+  formatted += ' [recurring]' if meeting.meetingType is 'recurring'
+  formatted
+
+printMeetings = (meetings) ->
+  messages = ['Here are the meetings I know about:']
+  messages.push(formattedMeeting(meeting)) for meeting in meetings
+  messages.join("\n")
+
 module.exports = (robot) ->
-  robot.respond /jump/i, (msg) ->
-    msg.reply 'how high?'
+  robot.respond /list meetings/i, (msg) ->
+    if not process.env.HUBOT_GOTOMEETING_USER_TOKEN?
+      msg.reply 'HUBOT_GOTOMEETING_USER_TOKEN is not set.'
+
+      return
+
+    token = process.env.HUBOT_GOTOMEETING_USER_TOKEN
+    msg.http('https://api.citrixonline.com/G2M/rest/meetings')
+      .headers(Authorization: "OAuth oauth_token=#{token}", Accept: 'application/json')
+      .get() (err, res, body) ->
+        switch res.statusCode
+          when 200
+            msg.reply printMeetings(JSON.parse(body))
+          when 403
+            msg.reply 'Token has expired. Please generate and set a new one.'
+          else
+            msg.reply "Unable to process your request and we're not sure why :("
