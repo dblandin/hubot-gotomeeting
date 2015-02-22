@@ -15,6 +15,10 @@
 # Author:
 #   Devon Blandin <dblandin@gmail.com>
 
+_ = require('lodash')
+
+apiRoot = 'https://api.citrixonline.com/G2M/rest'
+
 formattedMeeting = (meeting) ->
   formatted = "#{meeting.subject}"
   formatted += ' [active]' if meeting.status is 'ACTIVE'
@@ -26,6 +30,9 @@ printMeetings = (meetings) ->
   messages.push(formattedMeeting(meeting)) for meeting in meetings
   messages.join("\n")
 
+printJoinUrl = (meeting) ->
+  "Join #{meeting.subject} at https://www.gotomeeting.com/join/#{meeting.meetingid}"
+
 ensureConfig = (msg) ->
   if process.env.HUBOT_GOTOMEETING_USER_TOKEN?
     true
@@ -34,7 +41,35 @@ ensureConfig = (msg) ->
 
     false
 
+fetchMeetings = (msg, callback) ->
+  token = process.env.HUBOT_GOTOMEETING_USER_TOKEN
+
+  msg.http(apiRoot + '/meetings')
+    .headers(Authorization: "OAuth oauth_token=#{token}", Accept: 'application/json')
+    .get() callback
+
+findMeeting = (meetings, name) ->
+  _.find(meetings, (meeting) -> meeting.subject is name)
+
 module.exports = (robot) ->
+  robot.respond /join meeting (.*)/i, (msg) ->
+    return unless ensureConfig(msg)
+
+    name = msg.match[1].trim()
+
+    fetchMeetings msg, (err, res, body) ->
+      switch res.statusCode
+        when 200
+          meetings = JSON.parse(body)
+          if meeting = findMeeting(meetings, name)
+            msg.reply(printJoinUrl(meeting))
+          else
+            msg.reply("Sorry, I can't find that meeting")
+        when 403
+          msg.reply 'Token has expired. Please generate and set a new one.'
+        else
+          msg.reply "Unable to process your request and we're not sure why :("
+
   robot.respond /create meeting/i, (msg) ->
     return unless ensureConfig(msg)
 
@@ -55,7 +90,7 @@ module.exports = (robot) ->
       meetingtype: 'Immediate'
     })
 
-    msg.http('https://api.citrixonline.com/G2M/rest/meetings')
+    msg.http(apiRoot + '/meetings')
       .headers(Authorization: "OAuth oauth_token=#{token}", Accept: 'application/json')
       .post() (err, res, body) ->
         switch res.statusCode
@@ -71,7 +106,8 @@ module.exports = (robot) ->
     return unless ensureConfig(msg)
 
     token = process.env.HUBOT_GOTOMEETING_USER_TOKEN
-    msg.http('https://api.citrixonline.com/G2M/rest/meetings')
+
+    msg.http(apiRoot + '/meetings')
       .headers(Authorization: "OAuth oauth_token=#{token}", Accept: 'application/json')
       .get() (err, res, body) ->
         switch res.statusCode
