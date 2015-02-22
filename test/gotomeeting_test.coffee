@@ -3,28 +3,8 @@ path   = require('path')
 nock   = require('nock')
 
 nock('https://api.citrixonline.com/G2M/rest')
-  .get('/meetings')
-  .reply(200, [{
-    "startTime":          "2015-02-17T00:10:33.+0000",
-    "createTime":         "",
-    "meetingid":          525164341,
-    "maxParticipants":    26,
-    "passwordRequired":   "false",
-    "status":             "INACTIVE",
-    "subject":            "Weekly Product Meeting",
-    "meetingType":        "recurring",
-    "endTime":            "2015-02-17T01:10:33.+0000",
-    "uniqueMeetingId":    525164341,
-    "conferenceCallInfo": "US: +1 (571) 317-3131\nAccess Code: 525-164-341"
-  }])
-  .post('/meetings')
-  .reply(201, [{
-    "joinURL":            "https://www.gotomeeting.com/join/317680365",
-    "meetingid":          317680365,
-    "maxParticipants":    26,
-    "uniqueMeetingId":    317680365,
-    "conferenceCallInfo": "US: +1 (657) 220-3412\nAccess Code: 317-680-365"
-  }])
+  .get('/meetings').replyWithFile(200, __dirname + '/fixtures/meetings.json')
+  .post('/meetings').replyWithFile(201, __dirname + '/fixtures/create_meeting.json')
 
 Robot       = require('hubot/src/robot')
 TextMessage = require('hubot/src/message').TextMessage

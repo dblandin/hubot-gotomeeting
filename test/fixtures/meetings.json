@@ -1,0 +1,13 @@
+[{
+  "startTime":          "2015-02-17T00:10:33.+0000",
+  "createTime":         "",
+  "meetingid":          525164341,
+  "maxParticipants":    26,
+  "passwordRequired":   "false",
+  "status":             "INACTIVE",
+  "subject":            "Weekly Product Meeting",
+  "meetingType":        "recurring",
+  "endTime":            "2015-02-17T01:10:33.+0000",
+  "uniqueMeetingId":    525164341,
+  "conferenceCallInfo": "US: +1 (571) 317-3131\nAccess Code: 525-164-341"
+}]
