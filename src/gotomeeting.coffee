@@ -8,16 +8,16 @@
 #   hubot create meeting
 #   hubot create meeting <name>
 #   hubot create recurring meeting <name>
-#   hubot organize meeting <name>
+#   hubot host meeting <name>
 #   hubot join meeting <name>
 #   hubot list meetings
 #
 # Author:
 #   Devon Blandin <dblandin@gmail.com>
 
-_ = require('lodash')
-
+_       = require('lodash')
 apiRoot = 'https://api.citrixonline.com/G2M/rest'
+token   = process.env.HUBOT_GOTOMEETING_USER_TOKEN
 
 formattedMeeting = (meeting) ->
   formatted = "#{meeting.subject}"
@@ -31,7 +31,7 @@ printMeetings = (meetings) ->
   messages.join("\n")
 
 printJoinUrl = (meeting) ->
-  "Join #{meeting.subject} at https://www.gotomeeting.com/join/#{meeting.meetingid}"
+  "Join meeting '#{meeting.subject}' at https://www.gotomeeting.com/join/#{meeting.meetingid}"
 
 ensureConfig = (msg) ->
   if process.env.HUBOT_GOTOMEETING_USER_TOKEN?
@@ -42,7 +42,6 @@ ensureConfig = (msg) ->
     false
 
 fetchMeetings = (msg, callback) ->
-  token = process.env.HUBOT_GOTOMEETING_USER_TOKEN
 
   msg.http(apiRoot + '/meetings')
     .headers(Authorization: "OAuth oauth_token=#{token}", Accept: 'application/json')
@@ -52,6 +51,35 @@ findMeeting = (meetings, name) ->
   _.find(meetings, (meeting) -> meeting.subject is name)
 
 module.exports = (robot) ->
+  robot.respond /host meeting (.*)/i, (msg) ->
+    return unless ensureConfig(msg)
+
+    name = msg.match[1].trim()
+
+    fetchMeetings msg, (err, res, body) ->
+      switch res.statusCode
+        when 200
+          meetings = JSON.parse(body)
+          if meeting = findMeeting(meetings, name)
+            msg.http(apiRoot + "/meetings/#{meeting.meetingid}/start")
+              .headers(Authorization: "OAuth oauth_token=#{token}", Accept: 'application/json')
+              .get() (err, res, body) ->
+                switch res.statusCode
+                  when 200
+                    hostURL = JSON.parse(body).hostURL
+
+                    msg.reply("Host meeting '#{name}' at #{hostURL}")
+                  when 403
+                    msg.reply 'Token has expired. Please generate and set a new one.'
+                  else
+                    msg.reply "Unable to process your request and we're not sure why :("
+          else
+            msg.reply("Sorry, I can't find that meeting")
+        when 403
+          msg.reply 'Token has expired. Please generate and set a new one.'
+        else
+          msg.reply "Unable to process your request and we're not sure why :("
+
   robot.respond /join meeting (.*)/i, (msg) ->
     return unless ensureConfig(msg)
 
@@ -79,7 +107,6 @@ module.exports = (robot) ->
     tomorrow.setDate(now.getDate() + 1)
 
     subject = "#{user.name}-#{now.getTime()}"
-    token = process.env.HUBOT_GOTOMEETING_USER_TOKEN
     data = JSON.stringify({
       subject: subject,
       starttime: now.toISOString(),
@@ -104,8 +131,6 @@ module.exports = (robot) ->
 
   robot.respond /list meetings/i, (msg) ->
     return unless ensureConfig(msg)
-
-    token = process.env.HUBOT_GOTOMEETING_USER_TOKEN
 
     msg.http(apiRoot + '/meetings')
       .headers(Authorization: "OAuth oauth_token=#{token}", Accept: 'application/json')

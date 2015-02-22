@@ -13,6 +13,7 @@ describe 'hubot-gotomeeting', () ->
   beforeEach (done) ->
     nock('https://api.citrixonline.com/G2M/rest')
       .get('/meetings').replyWithFile(200, __dirname + '/fixtures/meetings.json')
+      .get('/meetings/525164341/start').replyWithFile(200, __dirname + '/fixtures/start_meeting.json')
       .post('/meetings').replyWithFile(201, __dirname + '/fixtures/create_meeting.json')
 
     process.env.HUBOT_GOTOMEETING_USER_TOKEN = 'abc123'
@@ -55,11 +56,19 @@ describe 'hubot-gotomeeting', () ->
 
   it 'can fetch the join URL for a meeting', (done) ->
     adapter.on 'reply', (envelope, strings) ->
-      expect(strings[0]).match(/Join Weekly Product Meeting at /)
+      expect(strings[0]).match(/Join meeting 'Weekly Product Meeting' at /)
 
       done()
 
     adapter.receive(new TextMessage(user, 'hubot join meeting Weekly Product Meeting'))
+
+  it 'start a meeting', (done) ->
+    adapter.on 'reply', (envelope, strings) ->
+      expect(strings[0]).match(/Host meeting 'Weekly Product Meeting'/)
+
+      done()
+
+    adapter.receive(new TextMessage(user, 'hubot host meeting Weekly Product Meeting'))
 
   it 'lists known meetings', (done) ->
     adapter.on 'reply', (envelope, strings) ->
