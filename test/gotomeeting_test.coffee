@@ -17,11 +17,19 @@ nock('https://api.citrixonline.com/G2M/rest')
     "uniqueMeetingId":    525164341,
     "conferenceCallInfo": "US: +1 (571) 317-3131\nAccess Code: 525-164-341"
   }])
+  .post('/meetings')
+  .reply(201, [{
+    "joinURL":            "https://www.gotomeeting.com/join/317680365",
+    "meetingid":          317680365,
+    "maxParticipants":    26,
+    "uniqueMeetingId":    317680365,
+    "conferenceCallInfo": "US: +1 (657) 220-3412\nAccess Code: 317-680-365"
+  }])
 
 Robot       = require('hubot/src/robot')
 TextMessage = require('hubot/src/message').TextMessage
 
-describe 'something', () ->
+describe 'hubot-gotomeeting', () ->
   robot   = null
   user    = null
   adapter = null
@@ -56,6 +64,14 @@ describe 'something', () ->
       done()
 
     adapter.receive(new TextMessage(user, 'hubot list meetings'))
+
+  it 'can create a meeting for you', (done) ->
+    adapter.on 'reply', (envelope, strings) ->
+      expect(strings[0]).match(/I've created a meeting for you:/)
+
+      done()
+
+    adapter.receive(new TextMessage(user, 'hubot create meeting'))
 
   it 'lists known meetings', (done) ->
     adapter.on 'reply', (envelope, strings) ->
