@@ -48,7 +48,7 @@ module.exports = (robot) ->
         if meeting = findMeeting(response.data, name)
           meeting.start()
             .then (response) ->
-              hostURL = response.hostURL
+              hostURL = response.data.hostURL
 
               msg.send("Host meeting '#{name}' at #{hostURL}")
 
