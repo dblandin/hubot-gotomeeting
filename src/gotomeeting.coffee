@@ -17,6 +17,7 @@
 
 Path         = require('path')
 MeetingStore = require(Path.join(__dirname, 'meeting_store'))
+Meeting      = require(Path.join(__dirname, 'meeting'))
 _            = require('lodash')
 apiRoot      = 'https://api.citrixonline.com/G2M/rest'
 token        = process.env.HUBOT_GOTOMEETING_USER_TOKEN
@@ -31,9 +32,6 @@ printMeetings = (meetings) ->
   messages = ['Here are the meetings I know about:']
   messages.push(formattedMeeting(meeting)) for meeting in meetings
   messages.join("\n")
-
-printJoinUrl = (meeting) ->
-  "Join meeting '#{meeting.subject}' at https://www.gotomeeting.com/join/#{meeting.meetingid}"
 
 ensureConfig = (msg) ->
   if process.env.HUBOT_GOTOMEETING_USER_TOKEN?
@@ -76,8 +74,10 @@ module.exports = (robot) ->
 
     store.all()
       .then (response) ->
-        if meeting = findMeeting(response.data, name)
-          msg.reply(printJoinUrl(meeting))
+        if meetingParams = findMeeting(response.data, name)
+          meeting = new Meeting(meetingParams)
+
+          msg.reply "Join meeting '#{meeting.name()}' at #{meeting.joinUrl}"
         else
           msg.reply("Sorry, I can't find that meeting")
 

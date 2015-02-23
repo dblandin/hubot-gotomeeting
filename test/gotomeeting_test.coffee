@@ -68,7 +68,7 @@ describe 'hubot-gotomeeting', () ->
 
     adapter.receive(new TextMessage(user, 'hubot join meeting Weekly Product Meeting'))
 
-  it 'start a meeting', (done) ->
+  it 'can fetch informating for hosting a meeting', (done) ->
     api.get('/meetings').replyWithFile(200, __dirname + '/fixtures/meetings.json')
     api.get('/meetings/525164341/start').replyWithFile(200, __dirname + '/fixtures/start_meeting.json')
 
