@@ -13,6 +13,9 @@ class GoToMeetingAdapter
 
   create: (params) ->
 
+  start: (meetingId) ->
+    http.get(@apiRoot + @meetingsPath + "/#{meetingId}/start")
+
   joinUrl: (meetingId) ->
     @joinRoot + "/#{meetingId}"
 

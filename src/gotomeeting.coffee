@@ -42,7 +42,9 @@ ensureConfig = (msg) ->
     false
 
 findMeeting = (meetings, name) ->
-  _.find(meetings, (meeting) -> meeting.subject is name)
+  params = _.find(meetings, (meeting) -> meeting.subject is name)
+
+  new Meeting(params) if params
 
 module.exports = (robot) ->
   robot.respond /host meeting (.*)/i, (msg) ->
@@ -54,18 +56,12 @@ module.exports = (robot) ->
     store.all()
       .then (response) ->
         if meeting = findMeeting(response.data, name)
-          msg.http(apiRoot + "/meetings/#{meeting.meetingid}/start")
-            .headers(Authorization: "OAuth oauth_token=#{token}", Accept: 'application/json')
-            .get() (err, res, body) ->
-              switch res.statusCode
-                when 200
-                  hostURL = JSON.parse(body).hostURL
+          meeting.start()
+            .then (response) ->
+              hostURL = response.hostURL
 
-                  msg.reply("Host meeting '#{name}' at #{hostURL}")
-                when 403
-                  msg.reply 'Token has expired. Please generate and set a new one.'
-                else
-                  msg.reply "Unable to process your request and we're not sure why :("
+              msg.reply("Host meeting '#{name}' at #{hostURL}")
+
   robot.respond /join meeting (.*)/i, (msg) ->
     return unless ensureConfig(msg)
 
@@ -74,9 +70,7 @@ module.exports = (robot) ->
 
     store.all()
       .then (response) ->
-        if meetingParams = findMeeting(response.data, name)
-          meeting = new Meeting(meetingParams)
-
+        if meeting = findMeeting(response.data, name)
           msg.reply "Join meeting '#{meeting.name()}' at #{meeting.joinUrl}"
         else
           msg.reply("Sorry, I can't find that meeting")
