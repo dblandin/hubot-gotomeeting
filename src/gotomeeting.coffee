@@ -27,7 +27,7 @@ ensureConfig = (msg) ->
   if process.env.HUBOT_GOTOMEETING_USER_TOKEN?
     true
   else
-    msg.reply 'HUBOT_GOTOMEETING_USER_TOKEN is not set.'
+    msg.send 'HUBOT_GOTOMEETING_USER_TOKEN is not set.'
 
     false
 
@@ -50,7 +50,7 @@ module.exports = (robot) ->
             .then (response) ->
               hostURL = response.hostURL
 
-              msg.reply("Host meeting '#{name}' at #{hostURL}")
+              msg.send("Host meeting '#{name}' at #{hostURL}")
 
   robot.respond /join meeting (.*)/i, (msg) ->
     return unless ensureConfig(msg)
@@ -61,9 +61,9 @@ module.exports = (robot) ->
     store.all()
       .then (response) ->
         if meeting = findMeeting(response.data, name)
-          msg.reply "Join meeting '#{meeting.name()}' at #{meeting.joinUrl()}"
+          msg.send "Join meeting '#{meeting.name()}' at #{meeting.joinUrl()}"
         else
-          msg.reply("Sorry, I can't find that meeting.")
+          msg.send("Sorry, I can't find that meeting.")
 
   robot.respond /create meeting\s?(.*)/i, (msg) ->
     return unless ensureConfig(msg)
@@ -79,7 +79,7 @@ module.exports = (robot) ->
       .then (response) ->
         meeting = new Meeting(response.data[0])
 
-        msg.reply "I've created the meeting '#{name}' for you.\nJoin: #{meeting.joinUrl()}"
+        msg.send "I've created the meeting '#{name}' for you.\nJoin: #{meeting.joinUrl()}"
 
   robot.respond /create recurring meeting\s?(.*)/i, (msg) ->
     return unless ensureConfig(msg)
@@ -90,7 +90,7 @@ module.exports = (robot) ->
     name = msg.match[1]
 
     unless name?
-      msg.reply 'A recurring meeting needs a name.'
+      msg.send 'A recurring meeting needs a name.'
 
       return
 
@@ -100,7 +100,7 @@ module.exports = (robot) ->
       .then (response) ->
         meeting = new Meeting(response.data[0])
 
-        msg.reply "I've created the recurring meeting '#{name}' for you.\nJoin: #{meeting.joinUrl()}"
+        msg.send "I've created the recurring meeting '#{name}' for you.\nJoin: #{meeting.joinUrl()}"
 
   robot.respond /list meetings/i, (msg) ->
     return unless ensureConfig(msg)
@@ -111,4 +111,4 @@ module.exports = (robot) ->
       .then (response) ->
         meetings = (new Meeting(params) for params in response.data)
 
-        msg.reply new MeetingListFormatter(meetings).message()
+        msg.send new MeetingListFormatter(meetings).message()

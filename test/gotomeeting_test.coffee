@@ -38,7 +38,7 @@ describe 'hubot-gotomeeting', () ->
   it 'alerts you when the required environment variable is not set', (done) ->
     delete process.env.HUBOT_GOTOMEETING_USER_TOKEN
 
-    adapter.on 'reply', (envelope, strings) ->
+    adapter.on 'send', (envelope, strings) ->
       api.isDone()
 
       expect(strings[0]).match(/HUBOT_GOTOMEETING_USER_TOKEN is not set/)
@@ -49,7 +49,7 @@ describe 'hubot-gotomeeting', () ->
 
   it 'will let you know when a meeting cannot be found', (done) ->
     api.get('/meetings').replyWithFile(200, __dirname + '/fixtures/meetings.json')
-    adapter.on 'reply', (envelope, strings) ->
+    adapter.on 'send', (envelope, strings) ->
       expect(strings[0]).match(/Sorry, I can't find that meeting/)
 
       api.isDone()
@@ -59,7 +59,7 @@ describe 'hubot-gotomeeting', () ->
 
   it 'can fetch the join URL for a meeting', (done) ->
     api.get('/meetings').replyWithFile(200, __dirname + '/fixtures/meetings.json')
-    adapter.on 'reply', (envelope, strings) ->
+    adapter.on 'send', (envelope, strings) ->
       api.isDone()
 
       expect(strings[0]).match(/Join meeting 'Weekly Product Meeting' at /)
@@ -72,7 +72,7 @@ describe 'hubot-gotomeeting', () ->
     api.get('/meetings').replyWithFile(200, __dirname + '/fixtures/meetings.json')
     api.get('/meetings/525164341/start').replyWithFile(200, __dirname + '/fixtures/start_meeting.json')
 
-    adapter.on 'reply', (envelope, strings) ->
+    adapter.on 'send', (envelope, strings) ->
       api.isDone()
 
       expect(strings[0]).match(/Host meeting 'Weekly Product Meeting'/)
@@ -84,10 +84,9 @@ describe 'hubot-gotomeeting', () ->
   it 'lists known meetings', (done) ->
     api.get('/meetings').replyWithFile(200, __dirname + '/fixtures/meetings.json')
 
-    adapter.on 'reply', (envelope, strings) ->
+    adapter.on 'send', (envelope, strings) ->
       api.isDone()
 
-      expect(strings[0]).match(/meetings/)
       expect(strings[0]).match(/Weekly Product Meeting/)
 
       done()
@@ -96,7 +95,7 @@ describe 'hubot-gotomeeting', () ->
 
   it 'can create a meeting for you', (done) ->
     api.post('/meetings').replyWithFile(201, __dirname + '/fixtures/create_meeting.json')
-    adapter.on 'reply', (envelope, strings) ->
+    adapter.on 'send', (envelope, strings) ->
       api.isDone()
 
       expect(strings[0]).match(/I've created the meeting 'mocha/)
@@ -107,10 +106,10 @@ describe 'hubot-gotomeeting', () ->
 
   it 'can create a named meeting for you', (done) ->
     api.post('/meetings').replyWithFile(201, __dirname + '/fixtures/create_meeting.json')
-    adapter.on 'reply', (envelope, strings) ->
+    adapter.on 'send', (envelope, strings) ->
       api.isDone()
 
-      expect(strings[0]).match(/I've created the meeting 'test' for you:/)
+      expect(strings[0]).match(/I've created the meeting 'test' for you./)
 
       done()
 
@@ -118,10 +117,10 @@ describe 'hubot-gotomeeting', () ->
 
   it 'can create a recurring meeting for you', (done) ->
     api.post('/meetings').replyWithFile(201, __dirname + '/fixtures/create_meeting.json')
-    adapter.on 'reply', (envelope, strings) ->
+    adapter.on 'send', (envelope, strings) ->
       api.isDone()
 
-      expect(strings[0]).match(/I've created the recurring meeting 'test' for you:/)
+      expect(strings[0]).match(/I've created the recurring meeting 'test' for you./)
 
       done()
 
