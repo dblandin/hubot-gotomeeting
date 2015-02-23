@@ -3,7 +3,7 @@ class MeetingListFormatter
     @meetings = meetings
 
   message: ->
-    messages = ['Here are the meetings I know about:']
+    messages = []
     messages.push(@formattedMeeting(meeting)) for meeting in @meetings
     messages.join("\n")
 

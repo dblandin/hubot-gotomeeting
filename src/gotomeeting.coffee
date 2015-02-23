@@ -63,7 +63,7 @@ module.exports = (robot) ->
         if meeting = findMeeting(response.data, name)
           msg.reply "Join meeting '#{meeting.name()}' at #{meeting.joinUrl()}"
         else
-          msg.reply("Sorry, I can't find that meeting")
+          msg.reply("Sorry, I can't find that meeting.")
 
   robot.respond /create meeting\s?(.*)/i, (msg) ->
     return unless ensureConfig(msg)
@@ -79,7 +79,7 @@ module.exports = (robot) ->
       .then (response) ->
         meeting = new Meeting(response.data[0])
 
-        msg.reply "I've created the meeting '#{name}' for you: #{meeting.joinUrl()}"
+        msg.reply "I've created the meeting '#{name}' for you.\nJoin: #{meeting.joinUrl()}"
 
   robot.respond /create recurring meeting\s?(.*)/i, (msg) ->
     return unless ensureConfig(msg)
@@ -90,7 +90,7 @@ module.exports = (robot) ->
     name = msg.match[1]
 
     unless name?
-      msg.reply 'A recurring meeting needs a name'
+      msg.reply 'A recurring meeting needs a name.'
 
       return
 
@@ -100,7 +100,7 @@ module.exports = (robot) ->
       .then (response) ->
         meeting = new Meeting(response.data[0])
 
-        msg.reply "I've created the recurring meeting '#{name}' for you: #{meeting.joinUrl()}"
+        msg.reply "I've created the recurring meeting '#{name}' for you.\nJoin: #{meeting.joinUrl()}"
 
   robot.respond /list meetings/i, (msg) ->
     return unless ensureConfig(msg)
