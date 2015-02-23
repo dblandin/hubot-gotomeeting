@@ -2,13 +2,6 @@ _                  = require('lodash')
 Path               = require('path')
 GoToMeetingAdapter = require(Path.join(__dirname, 'go_to_meeting_adapter'))
 
-class Meeting
-  constructor: (params) ->
-    @params = params
-
-  name: ->
-    @params.subject
-
 class MeetingStore
   constructor: (options) ->
     @adapter = new GoToMeetingAdapter
