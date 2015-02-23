@@ -16,9 +16,8 @@
 #   Devon Blandin <dblandin@gmail.com>
 
 Path                 = require('path')
-formatters           = require(Path.join(__dirname, 'formatters'))
 Meeting              = require(Path.join(__dirname, 'meeting'))
-MeetingListFormatter = formatters.MeetingListFormatter
+MeetingListFormatter = require(Path.join(__dirname, 'formatters/meeting_list_formatter'))
 MeetingStore         = require(Path.join(__dirname, 'meeting_store'))
 _                    = require('lodash')
 apiRoot              = 'https://api.citrixonline.com/G2M/rest'
@@ -62,7 +61,7 @@ module.exports = (robot) ->
     store.all()
       .then (response) ->
         if meeting = findMeeting(response.data, name)
-          msg.reply "Join meeting '#{meeting.name()}' at #{meeting.joinUrl}"
+          msg.reply "Join meeting '#{meeting.name()}' at #{meeting.joinUrl()}"
         else
           msg.reply("Sorry, I can't find that meeting")
 
@@ -80,7 +79,7 @@ module.exports = (robot) ->
       .then (response) ->
         meeting = new Meeting(response.data[0])
 
-        msg.reply "I've created a meeting for you: #{meeting.joinUrl()}"
+        msg.reply "I've created the meeting '#{name}' for you: #{meeting.joinUrl()}"
 
   robot.respond /list meetings/i, (msg) ->
     return unless ensureConfig(msg)

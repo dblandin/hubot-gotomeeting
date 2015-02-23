@@ -13,6 +13,7 @@ describe 'hubot-gotomeeting', () ->
 
   beforeEach (done) ->
     api   = nock(apiRoot)
+    api.log(console.log)
     robot = new Robot(null, 'mock-adapter', false, 'hubot')
 
     process.env.HUBOT_GOTOMEETING_USER_TOKEN = 'abc123'
@@ -47,7 +48,7 @@ describe 'hubot-gotomeeting', () ->
 
     adapter.receive(new TextMessage(user, 'hubot list meetings'))
 
-  it 'can will let you know when a meeting cannot be found', (done) ->
+  it 'will let you know when a meeting cannot be found', (done) ->
     api.get('/meetings').replyWithFile(200, __dirname + '/fixtures/meetings.json')
     adapter.on 'reply', (envelope, strings) ->
       expect(strings[0]).match(/Sorry, I can't find that meeting/)
@@ -99,7 +100,7 @@ describe 'hubot-gotomeeting', () ->
     adapter.on 'reply', (envelope, strings) ->
       api.isDone()
 
-      expect(strings[0]).match(/I've created a meeting for you:/)
+      expect(strings[0]).match(/I've created the meeting 'mocha/)
 
       done()
 

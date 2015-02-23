@@ -14,7 +14,7 @@ class MeetingStore
     @adapter = new GoToMeetingAdapter
 
   create: (name) ->
-    @adapter.create(_.defaults({ subject: name }, @defaultMeetingParams))
+    @adapter.create(_.defaults({ subject: name }, @defaultMeetingParams()))
 
   find: (name, onFetch) ->
     @adapter.fetch(name)

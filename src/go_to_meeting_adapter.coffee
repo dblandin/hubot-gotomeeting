@@ -12,7 +12,7 @@ class GoToMeetingAdapter
   fetch: (name) ->
 
   create: (params) ->
-    http.post(@apiRoot + @meetingsPath, headers: @_headers())
+    http.post(@apiRoot + @meetingsPath, params, headers: @_headers())
 
   start: (meetingId) ->
     http.get(@apiRoot + @meetingsPath + "/#{meetingId}/start", headers: @_headers)

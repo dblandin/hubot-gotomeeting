@@ -13,4 +13,4 @@ class MeetingListFormatter
     formatted += ' [recurring]' if meeting.isRecurring()
     formatted
 
-module.exports.MeetingListFormatter = MeetingListFormatter
+module.exports = MeetingListFormatter
