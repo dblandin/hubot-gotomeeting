@@ -19,7 +19,7 @@ class Meeting
     @params.status
 
   meetingType: ->
-    @params.meetingtype
+    @params.meetingType
 
   joinUrl: ->
     @adapter.joinUrl(@id())
@@ -28,6 +28,6 @@ class Meeting
     @status() is 'ACTIVE'
 
   isRecurring: ->
-    @meetingType() is 'Recurring'
+    @meetingType() is 'recurring'
 
 module.exports = Meeting
