@@ -15,9 +15,11 @@
 # Author:
 #   Devon Blandin <dblandin@gmail.com>
 
-_       = require('lodash')
-apiRoot = 'https://api.citrixonline.com/G2M/rest'
-token   = process.env.HUBOT_GOTOMEETING_USER_TOKEN
+Path         = require('path')
+MeetingStore = require(Path.join(__dirname, 'meeting_store'))
+_            = require('lodash')
+apiRoot      = 'https://api.citrixonline.com/G2M/rest'
+token        = process.env.HUBOT_GOTOMEETING_USER_TOKEN
 
 formattedMeeting = (meeting) ->
   formatted = "#{meeting.subject}"
@@ -132,13 +134,7 @@ module.exports = (robot) ->
   robot.respond /list meetings/i, (msg) ->
     return unless ensureConfig(msg)
 
-    msg.http(apiRoot + '/meetings')
-      .headers(Authorization: "OAuth oauth_token=#{token}", Accept: 'application/json')
-      .get() (err, res, body) ->
-        switch res.statusCode
-          when 200
-            msg.reply printMeetings(JSON.parse(body))
-          when 403
-            msg.reply 'Token has expired. Please generate and set a new one.'
-          else
-            msg.reply "Unable to process your request and we're not sure why :("
+    store = new MeetingStore()
+
+    store.all()
+      .then((response) -> msg.reply printMeetings(response.data))
