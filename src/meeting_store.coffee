@@ -1,4 +1,5 @@
-Path = require('path')
+_                  = require('lodash')
+Path               = require('path')
 GoToMeetingAdapter = require(Path.join(__dirname, 'go_to_meeting_adapter'))
 
 class Meeting
@@ -12,17 +13,32 @@ class MeetingStore
   constructor: (options) ->
     @adapter = new GoToMeetingAdapter
 
-  create: (params, onCreate) ->
-    @adapter.create(params)
-      .then(onCreate)
+  create: (name) ->
+    @adapter.create(_.defaults({ subject: name }, @defaultMeetingParams))
 
   find: (name, onFetch) ->
     @adapter.fetch(name)
 
-  all: (onFetch) ->
+  all: ->
     @adapter.fetchAll()
 
   _castToMeetings: (data) ->
     data.reduce (meetingParams) new Meeting(params)
+
+  defaultMeetingParams: ->
+      starttime: @now().toISOString()
+      endtime: @tomorrow().toISOString()
+      passwordrequired: false
+      conferencecallinfo: 'Hybrid'
+      timezonekey: ''
+      meetingtype: 'Immediate'
+
+  now: ->
+    @_now ||= new Date()
+
+  tomorrow: ->
+    date = @now()
+    date.setDate(date.getDate() + 1)
+    date
 
 module.exports = MeetingStore

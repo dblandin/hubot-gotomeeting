@@ -78,33 +78,18 @@ module.exports = (robot) ->
   robot.respond /create meeting/i, (msg) ->
     return unless ensureConfig(msg)
 
-    user     = msg.message.user
-    now      = new Date
-    tomorrow = new Date(now)
-    tomorrow.setDate(now.getDate() + 1)
+    user = msg.message.user
+    now  = new Date()
 
-    subject = "#{user.name}-#{now.getTime()}"
-    data = JSON.stringify({
-      subject: subject,
-      starttime: now.toISOString(),
-      endtime: tomorrow.toISOString(),
-      passwordrequired: false,
-      conferencecallinfo: 'Hybrid',
-      timezonekey: '',
-      meetingtype: 'Immediate'
-    })
+    name = "#{user.name}-#{now.getTime()}"
 
-    msg.http(apiRoot + '/meetings')
-      .headers(Authorization: "OAuth oauth_token=#{token}", Accept: 'application/json')
-      .post() (err, res, body) ->
-        switch res.statusCode
-          when 201
-            meeting = JSON.parse(body)[0]
-            msg.reply "I've created a meeting for you: #{meeting.joinURL}"
-          when 403
-            msg.reply 'Token has expired. Please generate and set a new one.'
-          else
-            msg.reply "Unable to process your request and we're not sure why :("
+    store = new MeetingStore()
+
+    store.create(name)
+      .then (response) ->
+        meeting = new Meeting(response.data[0])
+
+        msg.reply "I've created a meeting for you: #{meeting.joinUrl()}"
 
   robot.respond /list meetings/i, (msg) ->
     return unless ensureConfig(msg)
