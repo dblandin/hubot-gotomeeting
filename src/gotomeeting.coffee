@@ -75,7 +75,7 @@ module.exports = (robot) ->
 
     store = new MeetingStore()
 
-    store.create(name)
+    store.create(name: name)
       .then (response) ->
         meeting = new Meeting(response.data[0])
 
