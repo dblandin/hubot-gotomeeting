@@ -81,6 +81,27 @@ module.exports = (robot) ->
 
         msg.reply "I've created the meeting '#{name}' for you: #{meeting.joinUrl()}"
 
+  robot.respond /create recurring meeting\s?(.*)/i, (msg) ->
+    return unless ensureConfig(msg)
+
+    user = msg.message.user
+    now  = new Date()
+
+    name = msg.match[1]
+
+    unless name?
+      msg.reply 'A recurring meeting needs a name'
+
+      return
+
+    store = new MeetingStore()
+
+    store.create(name: name, meetingType: 'Recurring')
+      .then (response) ->
+        meeting = new Meeting(response.data[0])
+
+        msg.reply "I've created the recurring meeting '#{name}' for you: #{meeting.joinUrl()}"
+
   robot.respond /list meetings/i, (msg) ->
     return unless ensureConfig(msg)
 

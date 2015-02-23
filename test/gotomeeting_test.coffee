@@ -115,3 +115,14 @@ describe 'hubot-gotomeeting', () ->
       done()
 
     adapter.receive(new TextMessage(user, 'hubot create meeting test'))
+
+  it 'can create a recurring meeting for you', (done) ->
+    api.post('/meetings').replyWithFile(201, __dirname + '/fixtures/create_meeting.json')
+    adapter.on 'reply', (envelope, strings) ->
+      api.isDone()
+
+      expect(strings[0]).match(/I've created the recurring meeting 'test' for you:/)
+
+      done()
+
+    adapter.receive(new TextMessage(user, 'hubot create recurring meeting test'))
