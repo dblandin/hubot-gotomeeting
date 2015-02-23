@@ -6,16 +6,29 @@ class Meeting
     @params = params
     @adapter = new GoToMeetingAdapter
 
-  name: ->
-    @params.subject
-
   start: ->
     @adapter.start(@id())
 
   id: ->
     @params.meetingid
 
+  name: ->
+    @params.subject
+
+  status: ->
+    @params.status
+
+  meetingType: ->
+    @params.meetingtype
+
   joinUrl: ->
     @adapter.joinUrl(@id())
+
+  isActive: ->
+    @status() is 'ACTIVE'
+
+  isRecurring: ->
+    @meetingType() is 'recurring'
+
 
 module.exports = Meeting

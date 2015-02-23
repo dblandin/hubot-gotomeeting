@@ -15,23 +15,14 @@
 # Author:
 #   Devon Blandin <dblandin@gmail.com>
 
-Path         = require('path')
-MeetingStore = require(Path.join(__dirname, 'meeting_store'))
-Meeting      = require(Path.join(__dirname, 'meeting'))
-_            = require('lodash')
-apiRoot      = 'https://api.citrixonline.com/G2M/rest'
-token        = process.env.HUBOT_GOTOMEETING_USER_TOKEN
-
-formattedMeeting = (meeting) ->
-  formatted = "#{meeting.subject}"
-  formatted += ' [active]' if meeting.status is 'ACTIVE'
-  formatted += ' [recurring]' if meeting.meetingType is 'recurring'
-  formatted
-
-printMeetings = (meetings) ->
-  messages = ['Here are the meetings I know about:']
-  messages.push(formattedMeeting(meeting)) for meeting in meetings
-  messages.join("\n")
+Path                 = require('path')
+formatters           = require(Path.join(__dirname, 'formatters'))
+Meeting              = require(Path.join(__dirname, 'meeting'))
+MeetingListFormatter = formatters.MeetingListFormatter
+MeetingStore         = require(Path.join(__dirname, 'meeting_store'))
+_                    = require('lodash')
+apiRoot              = 'https://api.citrixonline.com/G2M/rest'
+token                = process.env.HUBOT_GOTOMEETING_USER_TOKEN
 
 ensureConfig = (msg) ->
   if process.env.HUBOT_GOTOMEETING_USER_TOKEN?
@@ -97,4 +88,7 @@ module.exports = (robot) ->
     store = new MeetingStore()
 
     store.all()
-      .then((response) -> msg.reply printMeetings(response.data))
+      .then (response) ->
+        meetings = (new Meeting(params) for params in response.data)
+
+        msg.reply new MeetingListFormatter(meetings).message()
