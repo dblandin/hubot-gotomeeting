@@ -28,7 +28,6 @@ class Meeting
     @status() is 'ACTIVE'
 
   isRecurring: ->
-    @meetingType() is 'recurring'
-
+    @meetingType() is 'Recurring'
 
 module.exports = Meeting
