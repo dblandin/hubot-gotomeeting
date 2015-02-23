@@ -12,7 +12,7 @@ class GoToMeetingAdapter
   fetch: (name) ->
 
   create: (params) ->
-    http.post(@apiRoot + @meetingsPath, params, headers: @_headers())
+    http.post(@apiRoot + @meetingsPath, @_meetingParams(params), headers: @_headers())
 
   start: (meetingId) ->
     http.get(@apiRoot + @meetingsPath + "/#{meetingId}/start", headers: @_headers)
@@ -24,5 +24,14 @@ class GoToMeetingAdapter
     'Authorization': "OAuth oauth_token=#{@token}"
     'Accept': 'application/json'
     'Content-Type': 'application/json'
+
+  _meetingParams: (params) ->
+    subject: params.name
+    starttime: params.start.toISOString()
+    endtime: params.end.toISOString()
+    passwordrequired: false
+    conferencecallinfo: 'Hybrid'
+    timezonekey: ''
+    meetingtype: params.meetingType
 
 module.exports = GoToMeetingAdapter
