@@ -43,12 +43,6 @@ ensureConfig = (msg) ->
 
     false
 
-fetchMeetings = (msg, callback) ->
-
-  msg.http(apiRoot + '/meetings')
-    .headers(Authorization: "OAuth oauth_token=#{token}", Accept: 'application/json')
-    .get() callback
-
 findMeeting = (meetings, name) ->
   _.find(meetings, (meeting) -> meeting.subject is name)
 
@@ -56,49 +50,36 @@ module.exports = (robot) ->
   robot.respond /host meeting (.*)/i, (msg) ->
     return unless ensureConfig(msg)
 
-    name = msg.match[1].trim()
+    name  = msg.match[1].trim()
+    store = new MeetingStore()
 
-    fetchMeetings msg, (err, res, body) ->
-      switch res.statusCode
-        when 200
-          meetings = JSON.parse(body)
-          if meeting = findMeeting(meetings, name)
-            msg.http(apiRoot + "/meetings/#{meeting.meetingid}/start")
-              .headers(Authorization: "OAuth oauth_token=#{token}", Accept: 'application/json')
-              .get() (err, res, body) ->
-                switch res.statusCode
-                  when 200
-                    hostURL = JSON.parse(body).hostURL
+    store.all()
+      .then (response) ->
+        if meeting = findMeeting(response.data, name)
+          msg.http(apiRoot + "/meetings/#{meeting.meetingid}/start")
+            .headers(Authorization: "OAuth oauth_token=#{token}", Accept: 'application/json')
+            .get() (err, res, body) ->
+              switch res.statusCode
+                when 200
+                  hostURL = JSON.parse(body).hostURL
 
-                    msg.reply("Host meeting '#{name}' at #{hostURL}")
-                  when 403
-                    msg.reply 'Token has expired. Please generate and set a new one.'
-                  else
-                    msg.reply "Unable to process your request and we're not sure why :("
-          else
-            msg.reply("Sorry, I can't find that meeting")
-        when 403
-          msg.reply 'Token has expired. Please generate and set a new one.'
-        else
-          msg.reply "Unable to process your request and we're not sure why :("
-
+                  msg.reply("Host meeting '#{name}' at #{hostURL}")
+                when 403
+                  msg.reply 'Token has expired. Please generate and set a new one.'
+                else
+                  msg.reply "Unable to process your request and we're not sure why :("
   robot.respond /join meeting (.*)/i, (msg) ->
     return unless ensureConfig(msg)
 
-    name = msg.match[1].trim()
+    name  = msg.match[1].trim()
+    store = new MeetingStore()
 
-    fetchMeetings msg, (err, res, body) ->
-      switch res.statusCode
-        when 200
-          meetings = JSON.parse(body)
-          if meeting = findMeeting(meetings, name)
-            msg.reply(printJoinUrl(meeting))
-          else
-            msg.reply("Sorry, I can't find that meeting")
-        when 403
-          msg.reply 'Token has expired. Please generate and set a new one.'
+    store.all()
+      .then (response) ->
+        if meeting = findMeeting(response.data, name)
+          msg.reply(printJoinUrl(meeting))
         else
-          msg.reply "Unable to process your request and we're not sure why :("
+          msg.reply("Sorry, I can't find that meeting")
 
   robot.respond /create meeting/i, (msg) ->
     return unless ensureConfig(msg)
