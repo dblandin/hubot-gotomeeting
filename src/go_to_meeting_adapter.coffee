@@ -15,7 +15,7 @@ class GoToMeetingAdapter
     http.post(@apiRoot + @meetingsPath, @_meetingParams(params), headers: @_headers())
 
   start: (meetingId) ->
-    http.get(@apiRoot + @meetingsPath + "/#{meetingId}/start", headers: @_headers)
+    http.get(@apiRoot + @meetingsPath + "/#{meetingId}/start", headers: @_headers())
 
   joinUrl: (meetingId) ->
     @joinRoot + "/#{meetingId}"
