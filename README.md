@@ -1,5 +1,7 @@
 # hubot-gotomeeting
 
+![screencast](http://g.recordit.co/9UwbMjWUis.gif)
+
 ## Creating an unnamed one-time meeting
 
 GoToMeeting requires every meeting to have a name, but sometimes you just don't
