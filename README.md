@@ -49,6 +49,8 @@ This will retrieve the participant link for the meeting.
 ```
 [devon] hubot: join meeting Impromptu Check-In
 [hubot] Join meeting 'Impromptu Check-In' at https://joingotomeeting.com/s234234
+[hubot] Phone: US: +1 (571) 317-3131
+[hubot] Access Code: 555-555-555
 ```
 
 ## Listing known meetings

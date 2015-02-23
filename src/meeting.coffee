@@ -21,6 +21,9 @@ class Meeting
   meetingType: ->
     @params.meetingType
 
+  callInfo: ->
+    @params.conferenceCallInfo
+
   joinUrl: ->
     @adapter.joinUrl(@id())
 

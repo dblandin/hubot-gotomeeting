@@ -61,7 +61,7 @@ module.exports = (robot) ->
     store.all()
       .then (response) ->
         if meeting = findMeeting(response.data, name)
-          msg.send "Join meeting '#{meeting.name()}' at #{meeting.joinUrl()}"
+          msg.send "Join meeting '#{meeting.name()}' at #{meeting.joinUrl()}\nPhone: #{meeting.callInfo()}"
         else
           msg.send("Sorry, I can't find that meeting.")
 
