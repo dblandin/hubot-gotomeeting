@@ -13,7 +13,6 @@ describe 'hubot-gotomeeting', () ->
 
   beforeEach (done) ->
     api   = nock(apiRoot)
-    api.log(console.log)
     robot = new Robot(null, 'mock-adapter', false, 'hubot')
 
     process.env.HUBOT_GOTOMEETING_USER_TOKEN = 'abc123'
@@ -105,3 +104,14 @@ describe 'hubot-gotomeeting', () ->
       done()
 
     adapter.receive(new TextMessage(user, 'hubot create meeting'))
+
+  it 'can create a named meeting for you', (done) ->
+    api.post('/meetings').replyWithFile(201, __dirname + '/fixtures/create_meeting.json')
+    adapter.on 'reply', (envelope, strings) ->
+      api.isDone()
+
+      expect(strings[0]).match(/I've created the meeting 'test' for you:/)
+
+      done()
+
+    adapter.receive(new TextMessage(user, 'hubot create meeting test'))

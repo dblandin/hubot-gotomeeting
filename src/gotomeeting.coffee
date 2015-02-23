@@ -65,13 +65,13 @@ module.exports = (robot) ->
         else
           msg.reply("Sorry, I can't find that meeting")
 
-  robot.respond /create meeting/i, (msg) ->
+  robot.respond /create meeting\s?(.*)/i, (msg) ->
     return unless ensureConfig(msg)
 
     user = msg.message.user
     now  = new Date()
 
-    name = "#{user.name}-#{now.getTime()}"
+    name = msg.match[1] || "#{user.name}-#{now.getTime()}"
 
     store = new MeetingStore()
 
