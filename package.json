@@ -1,8 +1,8 @@
 {
   "name": "hubot-gotomeeting",
-  "version": "0.1.5",
+  "version": "0.1.6",
   "description": "hubot script to manage GoToMeeting meetings",
-  "main": "src/gotomeeting.coffee",
+  "main": "index.coffee",
   "scripts": {
     "test": "script/test",
     "shell": "hubot -r src"
